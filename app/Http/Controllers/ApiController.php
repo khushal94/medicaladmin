@@ -21,6 +21,7 @@ use App\Package;
 use App\LabBooking;
 use App\NurseBooking;
 use App\AmbulanceBooking;
+use App\Rating;
 use Response;
 use Redirect;
 use Hash;
@@ -352,12 +353,46 @@ class ApiController extends Controller
         }
     }
 
+    public function Check_Appointment(Request $request)
+    {
+        $user_id = $request->user_id;
+        $doctor_id = $request->doctor_id;
+        $appointment_time = $request->appointment_time;
+        $date = $request->date;
+        $in_clinic_var = $request->in_clinic;
+
+        $appointmentcheck = Appointment::where([ 'user_id'=>$user_id, 'doctor_id'=>$doctor_id, 'date'=>$date])->first();
+   
+        if ($appointmentcheck) {
+            return Response::json(
+                array(
+                'status' => false,
+                'msg' => 'Appointment already exists..',
+                'data' => $appointmentcheck
+            ),
+                201
+            );
+        }else{
+            return Response::json(
+                array(
+                'status' => true,
+                'msg' => 'Proceed',
+                'data' => $appointmentcheck
+            ),
+                200
+            );
+        }
+
+    }
+
     public function Book_Appointment(Request $request)
     {
         $user_id = $request->user_id;
         $doctor_id = $request->doctor_id;
         $appointment_time = $request->appointment_time;
         $date = $request->date;
+        $payment_id = $request->payment_id;
+        $in_clinic_var = $request->in_clinic;
 
         $appointmentcheck = Appointment::where([ 'user_id'=>$user_id, 'doctor_id'=>$doctor_id, 'date'=>$date])->first();
    
@@ -379,6 +414,8 @@ class ApiController extends Controller
         $Appointment->time_start = $request->time_start;
         $Appointment->first_time = $request->first_time;
         $Appointment->covid_symptoms = $request->covid_symptoms;
+        $Appointment->payment_id = $payment_id;
+        $Appointment->in_clinic = $in_clinic_var;
         if ($request->description) {
             $Appointment->description = $request->description;
         }
@@ -409,6 +446,44 @@ class ApiController extends Controller
         }
     }
 
+    public function Appointment_Rating(Request $request){
+  
+        $rating = new Rating();
+        $rating->user_id = $request->user_id;
+        $rating->count = $request->rating;
+        $rating->feedback = $request->feedback;
+        $rating->doctor_id = $request->doctor_id;
+        $rating->appointment_id = $request->appointment_id;
+        //update appointment---------------------------
+
+        $appoint = Appointment::find($request->appointment_id);
+        $appoint->is_rated = 1;
+        $appoint->save();
+
+        //---------------------------------------------
+        $rating->save();
+
+        if ($rating ) {
+            return Response::json(
+                array(
+                    'status' => true,
+                    'data' => $rating,
+                    'msg' => 'Rating saved successfully..'
+                ),
+                200
+            );
+        } else {
+            return Response::json(
+                array(
+                    'status' => false,
+                    'msg' => 'Rating not saved..'
+                ),
+                201
+            );
+        }
+
+    }
+
     public function User_Appointments(Request $request)
     {
         $user_id = $request->user_id;
@@ -422,8 +497,10 @@ class ApiController extends Controller
                 201
             );
         }
-
-        $Appointments = Appointment::leftJoin('doctors', 'appointments.doctor_id', '=', 'doctors.user_id')->leftJoin('users', 'appointments.doctor_id', '=', 'users.id')->where('appointments.user_id', $user_id)->get();
+        // wrong id------------
+        $Appointments = Appointment::leftJoin('doctors', 'appointments.doctor_id', '=', 'doctors.user_id')->
+        leftJoin('users', 'appointments.doctor_id', '=', 'users.id')->
+        where('appointments.user_id', $user_id)->get();
         if ($Appointments) {
             return Response::json(
                 array(
@@ -1019,6 +1096,31 @@ public function Book_Emergency_Service(Request $request)
                 'msg' => 'emergency request not sent, please contact support',
             ),
             201
+        );
+    }
+}
+
+public function Check_Pincode(Request $request){
+
+    $settings = Setting::where([ 'option_name'=>'pincode_av'] )->first();
+    $pincodes = explode(' ', $settings->option_value);
+
+    if( in_array( $request->pincode ,$pincodes ) )
+    {
+        return Response::json(
+            array(
+                'status' => true,
+                'msg' => 'Proceed',
+            ),
+            200
+        );
+    }else{
+        return Response::json(
+            array(
+                'status' => false,
+                'msg' => 'Pincode is not under our service area region',
+            ),
+            200
         );
     }
 }

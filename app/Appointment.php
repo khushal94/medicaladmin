@@ -12,6 +12,7 @@ class Appointment extends Model
 
 	protected $fillable = [
         'user_id','doctor_id','first_time','covid_symptoms','date', 'time_start', 'time_end', 'visited', 'status', 'description'
+		,'payment_id', 'in_clinic'
     ];
 
 	public function User(){

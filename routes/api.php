@@ -15,6 +15,9 @@ Route::post('/create-patient', 'ApiController@Create_Patient')->name('createpati
 Route::post('/app-landing', 'ApiController@App_Landing')->name('App_Landing');
 Route::post('/doctor-byid', 'ApiController@Doctor_By_ID')->name('doctor-by-id');
 Route::post('/book-appointment', 'ApiController@Book_Appointment')->name('doctor-appointment');
+Route::post('/check-appointment', 'ApiController@Check_Appointment')->name('check-appointment');
+
+
 Route::post('/user-appointments', 'ApiController@User_Appointments')->name('all-doctor-appointment');
 Route::get('/specialities', 'ApiController@Get_Specialities')->name('get-specialities');
 Route::post('/doctorby-speciality', 'ApiController@Doctors_By_Speciality')->name('doctorby-specialities');
@@ -41,6 +44,8 @@ Route::post('/get-nurse-bookings', 'ApiController@Get_NurseBooking')->name('get-
 Route::post('/get-conversations', 'ApiController@Get_User_Chats')->name('get-chats');
 Route::post('/send-chat-msg', 'ApiController@Send_Msg')->name('send-chat-message');
 Route::post('/book-emergency-service', 'ApiController@Book_Emergency_Service')->name('send-emergency-request');
+Route::post('/save-appointment-rating', 'ApiController@Appointment_Rating')->name('appointment-rating');
+Route::post('/check-pincode', 'ApiController@Check_Pincode')->name('checkpincode');
 
 
 //-----------------------Doctor Api's------------------------------------------------------------
