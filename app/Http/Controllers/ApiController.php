@@ -521,11 +521,18 @@ class ApiController extends Controller
 
     public function Upload_Prescription(Request $request)
     {
-        $image = $request->base64_image;
-        $image = str_replace('data:image/png;base64,', '', $image);
+        // $image = $request->base64_image;
+        // $image = str_replace('data:image/png;base64,', '', $image);
+        // $image = str_replace(' ', '+', $image);
+        // $rand_no = rand(1000, 100000);
+        // $imageName =   $request->user_id.'_'.$rand_no.'pres.png';
+
+        $image = $request->input('base64_image'); // image base64 encoded
+        preg_match("/data:image\/(.*?);/",$image,$image_extension); // extract the image extension
+        $image = preg_replace('/data:image\/(.*?);base64,/','',$image); // remove the type part
         $image = str_replace(' ', '+', $image);
-        $rand_no = rand(1000, 100000);
-        $imageName =   $request->user_id.'_'.$rand_no.'pres.png';
+        $imageName = 'image_' . time() . '.' . $image_extension[1]; //generating unique file name;
+        Storage::disk('prescription')->put($imageName,base64_decode($image));
     
         Storage::disk('prescription')->put($imageName, base64_decode($image));
         $imagepath = 'prescription/'.$imageName;
@@ -557,6 +564,40 @@ class ApiController extends Controller
                 201
             );
         }
+    }
+
+    public function Update_Profile_Image(Request $request)
+        {
+
+            $image = $request->input('base64_image'); // image base64 encoded
+            preg_match("/data:image\/(.*?);/",$image,$image_extension); // extract the image extension
+            $image = preg_replace('/data:image\/(.*?);base64,/','',$image); // remove the type part
+            $image = str_replace(' ', '+', $image);
+            $imageName = 'image_' . time() . '.' . $image_extension[1]; //generating unique file name;
+            Storage::disk('profile')->put($imageName,base64_decode($image));
+            $imagepath = 'profile/'.$imageName;
+            //save profile data----------------------------------------------------
+            $patient = Patient::where('user_id', $request->user_id)->update(['image' => $imagepath]);
+
+            if ($patient) {
+                return Response::json(
+                    array(
+                        'status' => true,
+                        'data' => $imageName,
+                        'msg' => 'Profile image updated..'
+                    ),
+                    200
+                );
+            }else{
+                return Response::json(
+                    array(
+                        'status' => false,
+                        'data' => $imageName,
+                        'msg' => 'Profile not updated'
+                    ),
+                    201
+                );
+            }
     }
 
     public function Get_Recent_Prescriptions(Request $request)
@@ -929,7 +970,7 @@ class ApiController extends Controller
             array(
                 'status' => true,
                 'data' => $patient,
-                'msg' => 'User Fetched'
+                'msg' => 'User Updated Successfully..'
             ),
             200
         );

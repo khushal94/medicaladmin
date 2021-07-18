@@ -46,7 +46,7 @@ Route::post('/send-chat-msg', 'ApiController@Send_Msg')->name('send-chat-message
 Route::post('/book-emergency-service', 'ApiController@Book_Emergency_Service')->name('send-emergency-request');
 Route::post('/save-appointment-rating', 'ApiController@Appointment_Rating')->name('appointment-rating');
 Route::post('/check-pincode', 'ApiController@Check_Pincode')->name('checkpincode');
-
+Route::post('/update-profile-image', 'ApiController@Update_Profile_Image')->name('update-image');
 
 //-----------------------Doctor Api's------------------------------------------------------------
 Route::post('/get-doctor-appointments', 'ApiDoctorController@Doctor_Appointments')->name('doctor-appointments');
