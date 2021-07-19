@@ -37,7 +37,7 @@ class ApiController extends Controller
 {
 
     public function checksms(Request $request){
-        $information =  $this->Send_SMS();
+        $information =  $this->Send_SMS('Hi, Your OTP is 987654', '91'.''.'9785558507');
 
         return Response::json(
             array(
@@ -121,7 +121,7 @@ class ApiController extends Controller
         if ($patient) {
             $six_digit_random_number = random_int(100000, 999999);
             //$information =  $this->Send_SMS('Your OTP is '.$six_digit_random_number.', for login using UdaipurMed, Thanks!', '919785558507');
-            $information =  $this->Send_SMS('Hi, Your OTP is '.$six_digit_random_number, '91'.''.$mobile);
+            $information =  $this->Send_SMS('Hi, Your OTP is '.$six_digit_random_number, '91'.''.'9785558507');
             $information = '';
             $patient->email = $patientdata->email;
             $patient->name = $patientdata->name;
@@ -454,13 +454,34 @@ class ApiController extends Controller
         $rating->feedback = $request->feedback;
         $rating->doctor_id = $request->doctor_id;
         $rating->appointment_id = $request->appointment_id;
-        //update appointment---------------------------
+        //update appointment-------------------------------------------------------------------------
 
         $appoint = Appointment::find($request->appointment_id);
         $appoint->is_rated = 1;
         $appoint->save();
 
-        //---------------------------------------------
+        //update doctor rating-----------------------------------------------------------------------
+        $AllRatings = Rating::where([ 'doctor_id'=>$request->doctor_id])->get();
+        $DoctorRatings = count($AllRatings);
+
+        if($DoctorRatings != 0){
+            $RatingsTotalValue = 0;
+            foreach ($AllRatings as $value) {
+                // add value----------------
+                if($value->count){$RatingsTotalValue = $RatingsTotalValue + $value->count;}
+            }
+    
+            $Average = $RatingsTotalValue / $DoctorRatings;
+            //update doctor rating-----------------------------------------------------------------------
+    
+        }else{
+            $Average = $rating->count;
+        }
+        $DoctorRecord = Doctor::where('user_id', $request->doctor_id)->update(['rating' => $Average]);
+       
+       // print_r($DoctorRecord); die(); exit;
+
+        //-------------------------------------------------------------------------------------------
         $rating->save();
 
         if ($rating ) {
@@ -647,6 +668,14 @@ class ApiController extends Controller
 
         $order->user_id = $request->user_id;
         $order->medicines = $request->medicines;
+        $order->payment_id = $request->payment_id;
+        $order->payment_type = $request->payment_type;
+        $order->type = 'MedicineOrder';
+
+        if($order->payment_type == 'ONLINE'){
+            $order->is_paid = 1;
+        }
+        
         $order->save();
 
         if ($order) {
@@ -951,7 +980,6 @@ class ApiController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'birthday' => ['required'],
             'gender' => ['required'],
-
         ]);
 
         $user = User::find($request->user_id);
@@ -1165,6 +1193,8 @@ public function Check_Pincode(Request $request){
         );
     }
 }
+
+
 
 
 }

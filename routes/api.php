@@ -50,8 +50,7 @@ Route::post('/update-profile-image', 'ApiController@Update_Profile_Image')->name
 
 //-----------------------Doctor Api's------------------------------------------------------------
 Route::post('/get-doctor-appointments', 'ApiDoctorController@Doctor_Appointments')->name('doctor-appointments');
-
-
+Route::post('/doctor-status', 'ApiDoctorController@Doctor_Status')->name('doctor-status');
 
 //Settings
 /* Doctorino Settings */
@@ -61,6 +60,7 @@ Route::post('/settings/doctorino_settings', 'SettingController@doctorino_setting
 Route::get('/settings/prescription_settings', 'SettingController@prescription_settings')->name('prescription_settings.edit');
 Route::post('/settings/prescription_settings', 'SettingController@prescription_settings_store')->name('prescription_settings.store');
 
+Route::get('/checksms', 'ApiController@checksms')->name('xc-xc');
 
 // });
 

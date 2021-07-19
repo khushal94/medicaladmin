@@ -67,4 +67,23 @@ public function Doctor_Appointments(Request $request)
         }
     }
 
+    public function Doctor_Status(Request $request){
+
+        if($request->get_status == true){
+            $doctordata = Doctor::where([ 'user_id'=>$request->doctor_id])->first();
+        }else{
+            $doctordata = Doctor::where('user_id', $request->doctor_id)
+            ->update(['is_available' => $request->status]);
+        }
+    
+        return Response::json(
+            array(
+                'status' => true,
+                'data' =>$doctordata,
+                'msg' => 'Status Called',
+            ),
+            200
+        );
+    }
+
 }

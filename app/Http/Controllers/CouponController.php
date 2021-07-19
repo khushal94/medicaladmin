@@ -68,7 +68,8 @@ class CouponController extends Controller
 								'discount_type' => $request->discount_type,
 								'minimum_amount' => $request->minimum_amount,
 								'startingdate' => $request->startingdate,
-								'endingdate' => $request->endingdate,]);
+								'endingdate' => $request->endingdate,
+								'description' => $request->description]);
 
 		return Redirect::back()->with('success', __('sentence.Coupon Updated Successfully'));
 
@@ -89,6 +90,7 @@ class CouponController extends Controller
     	]);
 		$coupon = new Coupon();
 		$coupon->name = $request->name;
+		$coupon->description = $request->description;
 		$coupon->code = $request->code;
 		$coupon->category = $request->category;
 		$coupon->discount_amount = $request->discount_amount;
